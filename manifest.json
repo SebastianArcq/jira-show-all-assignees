@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Jira Show All Assignees",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Shows all assignees in Jira board filter instead of hiding behind +N",
   "content_scripts": [{
     "matches": ["*://*.atlassian.net/jira/*"],
