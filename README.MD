@@ -1,5 +1,6 @@
 # Jira Show All Assignees
 Chrome Web Store: https://chromewebstore.google.com/detail/jira-show-all-assignees/ocanddncnmhnboilkfiihbgijabjiekd
+
 Github: https://github.com/SebastianArcq/jira-show-all-assignees
 
 
