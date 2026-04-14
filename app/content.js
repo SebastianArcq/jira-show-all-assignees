@@ -2,7 +2,7 @@
  * Jira Show All Assignees Extension
  * 
  * This extension expands the hidden assignee avatars in Jira board filters.
- * By default, Jira only shows six assignees and hides the rest behind a "+N" button.
+ * By default, Jira only shows 5-6 assignees and hides the rest behind a "+N" button.
  * This extension automatically expands all assignees into a single row.
  */
 
@@ -11,7 +11,7 @@
  * We only want to run this extension on board pages to avoid interfering
  * with other Jira/Atlassian pages like Confluence or Jira issues.
  * 
- * returns {boolean} True if URL contains '/boards/'
+ * @returns {boolean} True if URL contains '/boards/'
  */
 function isJiraBoard() {
   return window.location.pathname.includes('/boards/');
@@ -23,6 +23,12 @@ function isJiraBoard() {
  * that the user opens manually (like other menus in Jira).
  */
 let isProgrammaticClick = false;
+
+/**
+ * Flag to prevent multiple rapid clicks on avatars.
+ * When true, clicks are ignored until the current filter operation completes.
+ */
+let isProcessingClick = false;
 
 /**
  * CSS styles injected into the page.
@@ -232,15 +238,24 @@ function expandAssignees() {
       /**
        * Click handler for the avatar.
        * When clicked, it:
-       * 1. Toggles the visual checkbox state (blue circle)
-       * 2. Opens the hidden dropdown
-       * 3. Clicks the corresponding user in the dropdown (triggers Jira's filter)
-       * 4. Closes the dropdown
+       * 1. Ignores click if already processing another click
+       * 2. Toggles the visual checkbox state (blue circle)
+       * 3. Opens the hidden dropdown
+       * 4. Clicks the corresponding user in the dropdown (triggers Jira's filter)
+       * 5. Closes the dropdown
+       * 6. Resets processing flag when complete
        */
       newWrapper.addEventListener('click', (e) => {
         // Prevent default behavior and stop event bubbling
         e.preventDefault();
         e.stopPropagation();
+        
+        // Ignore click if we're already processing one
+        // This prevents double-click issues where the visual state gets out of sync
+        if (isProcessingClick) return;
+        
+        // Mark as processing to block further clicks
+        isProcessingClick = true;
         
         // Toggle the checkbox for immediate visual feedback (blue circle)
         if (newInput) {
@@ -269,6 +284,7 @@ function expandAssignees() {
             const remaining = document.querySelector('[id^="ds--dropdown"]');
             if (remaining) remaining.remove(); // Remove from DOM
             isProgrammaticClick = false; // Reset flag
+            isProcessingClick = false; // Allow new clicks
           }, 50);
         }, 100);
       });
